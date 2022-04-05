@@ -1,5 +1,9 @@
 # 如何写一个简单echo服务
 
+## 运行截图
+![Codes](./code_screenshots.png)
+![echo_run](./echo_run.png)
+
 ## 前置知识
 1. [socket](https://en.wikipedia.org/wiki/Network_socket)
 2. [tcp](https://en.wikipedia.org/wiki/Transmission_Control_Protocol)
