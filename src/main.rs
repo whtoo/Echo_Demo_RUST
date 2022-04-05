@@ -12,6 +12,9 @@ fn handle_connection(mut stream: TcpStream) {
     // }
     // 我们在下面case种的condition非常长，而body是empty pass
     while match stream.read(&mut data) {
+        // 字节流其实就是一个字节数组，它的读取和写入符合正常的数组方式
+        // 所以，必定是要根据某个确定的size来分批进行的。
+        // 匹配读入字节流的字节数（>0)表示读取成功且数目为size
        Ok(size) => {
         // 将读入的字节流原样写入响应流,
         // 注意这里忽略了写入响应流的字节数返回.unwrap()的返回值是usize(即写入的字节数)
@@ -19,9 +22,10 @@ fn handle_connection(mut stream: TcpStream) {
         // 为什么要return true？因为，我要在读取size的字节后，继续进行读取任务
         true
        },
-       Err(err) => {
+       // 匹配错误的case，注意我们在这里忽略了真正的err
+       Err(_) => {
+           // 打印错误发生的字节流的地址信息(IP:PORT)
            println!("An error occurred, terminating connection with {}",stream.peer_addr().unwrap());
-           println!("Error is {}",err);
            // 关闭字节流（输入和输出都关闭)
            stream.shutdown(Shutdown::Both).unwrap();
             // 无它，跳出request的处理
@@ -49,15 +53,19 @@ fn main() {
     for stream in listener.incoming() {
         // 这里的match用来区分无错误的字节流（请求）与发生错误（比如，最大连接数或者超时）
         match stream {
+            // 
             Ok(stream) => {
+                // 打印收受的字节流请求的地址信息,etc: 127.0.0.1:52536
                 println!("New connection: {}",stream.peer_addr().unwrap());
                 // fork一个新的thread进行连接处理
                 // 为什么要fork一个新的？
                 // 如果不这样会不会导致阻塞？！
                 thread::spawn(move || {
+                    // 处理输入的字节流
                     handle_connection(stream)
                 });
             }
+            // 匹配错误的case
             Err(e) => {
                 // 打印捕获的错误                
                 println!("Error : {}",e);
