@@ -13,13 +13,15 @@ fn handle_connection(mut stream: TcpStream) {
     // 我们在下面case种的condition非常长，而body是empty pass
     while match stream.read(&mut data) {
        Ok(size) => {
-        // 将读入的字节流原样写入响应流
+        // 将读入的字节流原样写入响应流,
+        // 注意这里忽略了写入响应流的字节数返回.unwrap()的返回值是usize(即写入的字节数)
         stream.write(&data[0..size]).unwrap();
         // 为什么要return true？因为，我要在读取size的字节后，继续进行读取任务
         true
        },
-       Err(_) => {
+       Err(err) => {
            println!("An error occurred, terminating connection with {}",stream.peer_addr().unwrap());
+           println!("Error is {}",err);
            // 关闭字节流（输入和输出都关闭)
            stream.shutdown(Shutdown::Both).unwrap();
             // 无它，跳出request的处理
