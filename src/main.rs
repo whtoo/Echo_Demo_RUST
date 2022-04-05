@@ -5,8 +5,8 @@ use std::io::{Read,Write};
 // 所有的unwrap()都是我们假定前面的Optional[T] must be Some(T)
 // 处理被接受的字节流
 fn handle_connection(mut stream: TcpStream) {
-    // 以0x0填充一个长度为50的字节buffer
-    let mut data = [0 as u8; 50];
+    // 以0x0填充一个长度为1KB的字节buffer
+    let mut data = [0 as u8; 1024];
     // 这里的while match很有意思，正常来说我们写while(condition) {
     //     while-body
     // }
@@ -15,7 +15,7 @@ fn handle_connection(mut stream: TcpStream) {
        Ok(size) => {
         // 将读入的字节流原样写入响应流
         stream.write(&data[0..size]).unwrap();
-        // 为什么要return true？因为，我要在读取size的字节后，继续进行读取任务，知道遇到EOF
+        // 为什么要return true？因为，我要在读取size的字节后，继续进行读取任务
         true
        },
        Err(_) => {
